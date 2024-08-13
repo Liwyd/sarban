@@ -2,6 +2,8 @@
 
 An application with python that allows you to modify your marzban panel ([Gozargah/Marzban](https://github.com/Gozargah/Marzban))
 
+- Special thanks to ((meta-syfu)[https://github.com/meta-syfu])
+
 ## How To Install
 
 ```
