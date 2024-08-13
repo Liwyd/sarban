@@ -19,7 +19,7 @@ from sarban import SARBAN
 
 
 sb = SARBAN(
-    full_address="http://liwyd.site:2087",
+    full_address="liwyd.site:2087",
     https=True
 )
 ```
