@@ -1,20 +1,22 @@
-from typing import Union
+from typing import Union, Dict, Any
 
 import sarban
 from sarban import errors
 
+
 class Inbounds:
     def get_users(
         self: "sarban.SARBAN"
-    ) -> Union[dict, errors.NotFound]:
-        """Get inbounds of the Marzban.
+    ) -> Union[Dict[str, Any], errors.NotFound]:
+        """Get all users (legacy method for backward compatibility).
+        
+        Note: This method is kept for backward compatibility.
+        Consider using get_users() from Clients class instead.
         
         Returns:
-            `~Dict | errors.NotFound`: On success, a dict is returned else 404 error will be raised
+            `~Dict`: Users response with users list and total count.
         """
-        
-
-        params = {
+        headers = {
             'accept': 'application/json',
             'Authorization': f'Bearer {self.token}'
         }
@@ -22,7 +24,7 @@ class Inbounds:
         response = self.request(
             path="users",
             method="GET",
-            headers=params
+            headers=headers
         )
 
         return self.verify_response(response)
