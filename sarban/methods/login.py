@@ -1,15 +1,15 @@
-import json
 from typing import Any
 import sarban
 from sarban import errors
+
 
 class Login:
     def login(
         self: "sarban.SARBAN",
         username: str,
         password: str
-    ) -> Any:
-        """Login into marzan panel.
+    ) -> bool:
+        """Login into Marzban panel.
 
         Parameters:
             username (``str``):
@@ -19,17 +19,18 @@ class Login:
                 Password of panel
 
         Returns:
-            `~Any`: On success, True is returned else an error will be raised
-        """
-        
-        if self.session_string:
-            raise errors.AlreadyLogin()
-        
+            `~bool`: True on successful login.
 
+        Raises:
+            `~errors.AlreadyLogin`: If already logged in
+            `~errors.BadLogin`: If credentials are invalid
+        """
+        if self.token:
+            raise errors.AlreadyLogin()
 
         headers = {
-        'accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
+            'accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
         }
 
         data = {
@@ -41,15 +42,23 @@ class Login:
             'client_secret': ''
         }
 
-
-        send_request = self.request(
+        response = self.request(
             path="admin/token",
             method="POST",
             data=data,
             headers=headers
         )
-        if send_request.status_code == 200:
-            self.token = json.loads(send_request.text)["access_token"]
-            return True
-            
-        raise errors.BadLogin()
+
+        if response.status_code == 200:
+            try:
+                result = response.json()
+                self.token = result.get("access_token")
+                if not self.token:
+                    raise errors.BadLogin()
+                return True
+            except (ValueError, KeyError):
+                raise errors.BadLogin()
+        elif response.status_code == 401:
+            raise errors.BadLogin()
+        else:
+            raise errors.HTTPException(response.status_code, "Login failed")
